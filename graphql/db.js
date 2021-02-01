@@ -1,42 +1,22 @@
-let movies = [
-  {
-    id: 0,
-    name: "Seyoung",
-    score: 1,
-  },
-  {
-    id: 1,
-    name: "Seyoung2",
-    score: 1,
-  },
-  { id: 2, name: "Seyoung3", score: 1 },
-  { id: 3, name: "Seyoung4", score: 1 },
-  { id: 4, name: "Seyoung5", score: 1 },
-];
+import fetch from "node-fetch";
 
-export const getMovies = () => movies;
+// YTS API에서 영화 정보를 가져온다.
+const API_URL = "https://yts.am/api/v2/list_movies.json?";
 
-export const getById = (id) => {
-  const filteredPeople = people.filter((person) => person.id === id);
-  return filteredPeople[0];
-};
-
-export const deleteMovie = (id) => {
-  const cleanMovies = movies.filter((movie) => movie.id !== id);
-  if (movies.length > cleanMovies.length) {
-    movies = cleanMovies;
-    return true;
-  } else {
-    return false;
+// 영화를 갸져올 갯수, 평점을 통해 URL의 파라미터에 값을 넘겨 특정 데이터만 가져온다.
+export const getMovies = (limit, rating) => {
+  // 요청할 Rest API.
+  let REQUEST_URL = API_URL;
+  // limit 값이 0 이상이면, limit 파리미터를 붙인다.
+  if (limit > 0) {
+    REQUEST_URL += `limit=${limit}`;
   }
-};
-
-export const addMovie = (name, score) => {
-  const newMovie = {
-    id: `${movies.length + 1}`,
-    name,
-    score,
-  };
-  movies.push(newMovie);
-  return newMovie;
+  // rating 값이 0 이상이면, rating 파리미터를 붙인다.
+  if (rating > 0) {
+    REQUEST_URL += `&minimum_rating=${rating}`;
+  }
+  // 가져온 데이터를 json 타입으로 변경 후, movies 데이터를 뽑아낸다.
+  return fetch(REQUEST_URL)
+    .then((res) => res.json())
+    .then((json) => json.data.movies);
 };
