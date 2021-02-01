@@ -1,22 +1,50 @@
-import fetch from "node-fetch";
+import axios from "axios";
 
 // YTS API에서 영화 정보를 가져온다.
-const API_URL = "https://yts.am/api/v2/list_movies.json?";
+const BASE_URL = "https://yts.am/api/v2/";
+const LIST_MOVIES_URL = `${BASE_URL}list_movies.json`;
+const MOVIE_DETAILS_URL = `${BASE_URL}movie_details.json`;
+const MOVIE_SUGGESTIONS_URL = `${BASE_URL}movie_suggestions.json`;
 
-// 영화를 갸져올 갯수, 평점을 통해 URL의 파라미터에 값을 넘겨 특정 데이터만 가져온다.
-export const getMovies = (limit, rating) => {
-  // 요청할 Rest API.
-  let REQUEST_URL = API_URL;
-  // limit 값이 0 이상이면, limit 파리미터를 붙인다.
-  if (limit > 0) {
-    REQUEST_URL += `limit=${limit}`;
-  }
-  // rating 값이 0 이상이면, rating 파리미터를 붙인다.
-  if (rating > 0) {
-    REQUEST_URL += `&minimum_rating=${rating}`;
-  }
-  // 가져온 데이터를 json 타입으로 변경 후, movies 데이터를 뽑아낸다.
-  return fetch(REQUEST_URL)
-    .then((res) => res.json())
-    .then((json) => json.data.movies);
+// 영화를 가져올 갯수, 평점을 통해 axios에 파라미터 값을 담아서 데이터를 가져온다.
+export const getMovies = async (limit, rating) => {
+  const {
+    data: {
+      data: { movies },
+    },
+  } = await axios(LIST_MOVIES_URL, {
+    params: {
+      limit,
+      minimum_rating: rating,
+    },
+  });
+  return movies;
+};
+
+// 특정 영화 데이터를 가져온다.
+export const getMovie = async (id) => {
+  const {
+    data: {
+      data: { movie },
+    },
+  } = await axios(MOVIE_DETAILS_URL, {
+    params: {
+      movie_id: id,
+    },
+  });
+  return movie;
+};
+
+// 특정 영화의 제안들을 가져온다.
+export const getSuggestions = async (id) => {
+  const {
+    data: {
+      data: { movies },
+    },
+  } = await axios(MOVIE_SUGGESTIONS_URL, {
+    params: {
+      movie_id: id,
+    },
+  });
+  return movies;
 };
